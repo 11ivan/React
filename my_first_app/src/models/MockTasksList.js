@@ -1,4 +1,4 @@
-export class TasksList {
+export class MockTasksList {
     constructor() {
         this.tasks = [];
         /*this.tasks = [

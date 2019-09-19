@@ -7,5 +7,6 @@ export class TaskModel {
         this.creationDate = null;
         //this.modifiedDate = null;
         this.completed = false;
+
     }
 }

@@ -2,8 +2,8 @@ import React from "react";
 import { Router, Route } from "react-router-dom";
 import { createBrowserHistory } from 'history'
 
-import Home from "./Home";
-import About from "./About";
+import Home from "./pages/Home";
+import About from "./pages/About";
 
 const history = createBrowserHistory();
 const Routes = () => {

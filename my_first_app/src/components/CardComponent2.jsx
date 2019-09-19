@@ -7,7 +7,7 @@ export default class CardComponent2 extends React.Component {
     }*/
 
     edit = (e) => {
-        this.props.editFunction(e, this.props.taskId);
+        this.props.editFunction(e, this.props.index);
     }
 
     delete = (e) => {
@@ -36,8 +36,8 @@ export default class CardComponent2 extends React.Component {
                         {this.props.desc}
                     </div>
                 </div>
-                <div><i class="material-icons" onClick={(e) => this.edit(e)}>edit</i></div>
-                <div><i class="material-icons" onClick={(e) => this.delete(e)}>delete</i></div>
+                <div><i className="material-icons" onClick={(e) => this.edit(e)}>edit</i></div>
+                <div><i className="material-icons" onClick={(e) => this.delete(e)}>delete</i></div>
             </div>
 
         );

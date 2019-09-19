@@ -1,7 +1,7 @@
 import React from 'react';
 //import { TasksList } from './models/TasksList';
-import { TaskModel } from './models/TaskModel';
-import CardComponent2 from './components/CardComponent2';
+import { TaskModel } from '../models/TaskModel';
+import CardComponent2 from '../components/CardComponent2';
 
 const uuidV1 = require('uuid/v1');
 
@@ -15,7 +15,6 @@ export default class Home extends React.Component {
             showForm: false,
         };
         this.taskModel = new TaskModel();
-        this.taskTitle = 'qewasd';
         this.isEdit = false;
     }
 
@@ -29,24 +28,6 @@ export default class Home extends React.Component {
 
     goToAbout = () => {
         this.props.history.push('/about');
-    }
-
-    addAutoToDo = () => {
-        let { tasksList } = this.state;
-        let task = new TaskModel();
-
-        task.id = uuidV1();
-        task.title = 'demo';
-        task.desc = 'This is a new auto created Task';
-        task.completed = false;
-        task.type = 'BAT';
-        let date = new Date();
-        //task.creationDate = `${date.getFullYear()} - ${date.getMonth() + 1} - ${date.getDate()}`;
-        let stringDate = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-        task.creationDate = `${stringDate}`;
-        tasksList.push(task);
-
-        this.setState({ tasksList });
     }
 
     showForm = () => {
@@ -85,18 +66,20 @@ export default class Home extends React.Component {
 
     handleFieldChange = (e, field) => {
         let value = e && e.target && e.target.value ? e.target.value : null;
-        switch (field) {
-            case 'title':
-                this.taskModel.title = value;
-                break;
-            case 'type':
-                this.taskModel.type = value;
-                break;
-            case 'desc':
-                this.taskModel.desc = value;
-                break;
+        if (value !== null) {
+            switch (field) {
+                case 'title':
+                    this.taskModel.title = value;
+                    break;
+                case 'type':
+                    this.taskModel.type = value;
+                    break;
+                case 'desc':
+                    this.taskModel.desc = value;
+                    break;
 
-            default: break;
+                default: break;
+            }
         }
     }
 
@@ -104,15 +87,18 @@ export default class Home extends React.Component {
         return true;
     }
 
-    editTodo = (e, todoId) => {
+
+    editTodo = (e, index) => {
         this.isEdit = true;
+        const { tasksList } = this.state;
+        this.taskModel = tasksList[index];
         this.showForm();
     }
 
     deleteTodo = (e, todoId) => {
         let { tasksList } = this.state;
 
-        var filtered = tasksList.filter((element, index, arr) => {
+        let filtered = tasksList.filter((element, index, arr) => {
             return element.id !== todoId;
         });
 
@@ -124,7 +110,7 @@ export default class Home extends React.Component {
         const { showForm } = this.state;
         return (
             <div className="mainDiv">
-                {/* FORM */}
+                {/* MODAL_FORM */}
                 {
                     showForm ?
                         <div className="formContainer">
@@ -136,7 +122,7 @@ export default class Home extends React.Component {
                                             X
                                         </div>
 
-                                        {!this.isEdit ?
+                                        {/* !this.isEdit ?
                                             <div>
                                                 <input type="text" placeholder="Title" onChange={(e) => this.handleFieldChange(e, 'title')}></input>
                                                 <input type="text" placeholder="Type" onChange={(e) => this.handleFieldChange(e, 'type')}></input>
@@ -144,22 +130,25 @@ export default class Home extends React.Component {
                                             </div>
                                             :
                                             <div>
-                                                <input type="text" placeholder="Title" ></input>
-                                                <input type="text" placeholder="Type" ></input>
-                                                <input type="text" placeholder="Desc" ></input>
-                                            </div>
+                                                <input type="text" placeholder="Title" defaultValue={this.taskModel.title} onChange={(e) => this.handleFieldChange(e, 'title')}></input>
+                                                <input type="text" placeholder="Type" defaultValue={this.taskModel.type} onChange={(e) => this.handleFieldChange(e, 'type')}></input>
+                                                <input type="text" placeholder="Desc" defaultValue={this.taskModel.desc} onChange={(e) => this.handleFieldChange(e, 'desc')}></input>
+                                            </div> */
                                         }
+                                        <div>
+                                            <input type="text" placeholder="Title" defaultValue={this.taskModel.title} onChange={(e) => this.handleFieldChange(e, 'title')}></input>
+                                            <input type="text" placeholder="Type" defaultValue={this.taskModel.type} onChange={(e) => this.handleFieldChange(e, 'type')}></input>
+                                            <input type="text" placeholder="Desc" defaultValue={this.taskModel.desc} onChange={(e) => this.handleFieldChange(e, 'desc')}></input>
+                                        </div>
 
                                         <div className="buttonsDiv">
                                             <div className="buttonCell">
                                                 <div className="cancelButton" onClick={this.showForm}>Cancel</div>
                                             </div>
                                             <div className="buttonCell">
-                                                {!this.isEdit ?
-                                                    <div className="saveButton" onClick={this.addTodo}>Save</div>
-                                                    :
-                                                    <div className="saveButton" onClick={this.editTodo}>Edit</div>
-                                                }
+                                                <div className="saveButton" onClick={!this.isEdit ? this.addTodo : this.editTodo}>
+                                                    {!this.isEdit ? 'Save' : 'Edit'}
+                                                </div>
                                             </div>
                                         </div>
 
@@ -169,7 +158,7 @@ export default class Home extends React.Component {
                         </div>
                         :
                         <div className="floatButton" onClick={this.showForm}>+</div>
-                }{/* END FORM */}
+                }{/* END MODAL_FORM */}
 
                 <div className="header" onClick={this.goToAbout}>
                     Header
