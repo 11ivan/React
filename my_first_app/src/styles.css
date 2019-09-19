@@ -1,0 +1,268 @@
+/*body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}*/
+
+.border{
+  border: 1px solid black;
+}
+
+/*GENERAL*/
+body {
+  outline: none;
+  outline-offset: 0;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  box-sizing: border-box;
+  box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  font-family: "Barlow", Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  font-size: 16px;
+  background: #fff;
+  color: #414141;
+
+  height: 100% !important;
+  overflow-y: auto !important;
+}
+* {
+  outline: none;
+  outline-offset: 0;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  letter-spacing: 0.5px;
+  box-sizing: border-box;
+}
+a,
+a:hover,
+a:focus {
+  color: #37b45a;
+}
+a[class]:hover,
+a[class]:focus {
+  text-decoration: none;
+}
+a:focus {
+  outline: none;
+  outline-offset: 0;
+}
+img {
+  max-width: 100%;
+  height: auto;
+}
+button {
+  background: none;
+  border: none;
+}
+button:focus {
+  outline: 0;
+}
+button:active > *,
+button:focus > * {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+/*Elementos Generales*/
+input[type="text"],
+.button,
+select,
+textarea,
+input[type="number"],
+input[type="tel"],
+input[type="date"],
+input[type="email"] {
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 50px;
+  padding: 0 16px;
+  height: 48px;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+  display: block;
+  width: 100%;
+  margin-bottom: 8px !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+}
+
+/*HOME*/
+.mainDiv{
+  width: 100%;
+  height: 100%;
+  background: lightyellow;
+}
+
+.header{
+  width: 100%;
+  padding: 16px;
+  background: gray;
+  display: inline-block;
+  text-align: left;
+}
+
+.listContainer{
+  width: 40%;
+  padding: 8px;
+  background: rgb(255, 255, 255);
+}
+
+.floatButton{
+  position: fixed;
+  top:250px;
+  left:800px;
+  border-radius: 100%;
+  border: none;
+  background: red;
+  font-size: 25px;
+  color: white;
+  width: 50px;
+  height: 50px;
+  padding: 10px;
+  text-align: center;
+}
+
+/*CARD COMPONENT*/
+.card{
+  width: 100%;
+  height: 200px;
+  border-radius: 15px;  
+  background: gray;
+  display: block;
+  margin-bottom: 10px;
+}
+.cardHeader{
+  background: rgba(0, 0, 255, 0.253);
+  border-radius: 15px 15px 0 0;  
+  padding: 1em;
+}
+.cardTitle{
+  width: 45%;
+  display: inline-block;
+  text-align: left;
+}
+.cardCreationDate{
+  width: 45%;
+  display: inline-block;
+  text-align: right;
+  margin-right: 10px;
+}
+.cardBody{
+  display: block;
+  min-height: 80px;
+  padding-left: 10px;
+  padding-top: 10px;
+  border-radius: 0 0 15px 15px;  
+  background: rgba(255, 196, 0, 0.267);
+}
+.completed{
+  background: rgba(0, 255, 64, 0.267);
+}
+.cardType{
+  margin-left: 10px;
+}
+.cardDesc{
+  margin-left: 10px;
+}
+
+/*MODAL*/
+.formContainer{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.tableDisplay{
+  display: table;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.726);
+}
+
+.cellDisplay{
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  padding-left: 450px;
+  padding-right: 450px;
+}
+
+.formContent{
+  position: relative;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.719);
+  border-radius: 25px;
+  /* text-align: center; */
+  padding: 45px;
+}
+.formContent > input{
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.formContent > input:last-child{
+  margin-bottom: 0px;
+  /*border: 1px solid black;*/
+}
+
+.buttonsDiv{
+  position: absolute;
+  bottom: 16px;
+  left:0;
+  right: 0;
+  /* border: 0.2px solid green; */
+  margin-left: 45px;
+  margin-right: 45px;
+}
+
+.buttonCell{
+  display: inline-block;
+  width: 50%;
+  /* border: 1px solid red; */
+}
+
+.cancelButton{
+  border: 1px solid blue;
+  width: 50%;
+  margin: auto;
+  border-radius: 15px;
+  padding: 10px 2px;
+}
+
+.saveButton{
+  border: 1px solid green;
+  width: 50%;
+  margin: auto;
+  border-radius: 15px;
+  padding: 10px 2px;
+}
+
+.closeButton{
+  position: absolute;
+  right: 0;
+  top: 0;
+  border-radius: 100%;
+  border: none;
+  background: red;
+  font-size: 12.5px;
+  color: white;
+  width: 25px;
+  height: 25px;
+  padding: 5px;
+  text-align: center;
+}
