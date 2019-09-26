@@ -21,9 +21,9 @@ class Container1 extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    console.log('STATE: ', state);
+    console.log('STATE: ', state.loginReducer);
     return {
-        itsLogged: state.itsLogged,
+        itsLogged: state.loginReducer.itsLogged,
     }
 }
 
