@@ -1,14 +1,17 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import './App.css';
-
-//var Tesseract = window.Tesseract;
-import { TesseractWorker } from 'tesseract.js';
 import { OcrLineResponseModel } from './OcrLineResponseModel';
-//import scanner from 'scanner-js';
-//import * as scanner from 'scanner-js';
-var scanner = window.scannerjs;
+
+//import Tesseract from 'tesseract.js';// Tesseract v1, npm install tesseract.js
+
+// Tesseract v2, npm install tesseract.js@next
+import Tesseract from 'tesseract.js';
+
+const { TesseractWorker } = Tesseract;
 const worker = new TesseractWorker();
+
+//var scanner = window.scannerjs;
 
 class App extends Component {
   constructor(props) {
@@ -29,15 +32,40 @@ class App extends Component {
     });
   }
 
-  handleChange = (event) => {
+  handleChangeFreeOcrApi = (event) => {
     if (event.target.files[0]) {
       var uploads = []
       for (var key in event.target.files) {
         if (!event.target.files.hasOwnProperty(key)) continue;
         let upload = event.target.files[key];
         //console.log('FILE: ', upload);
-        uploads.push(upload);
-        //uploads.push(URL.createObjectURL(upload));For Tesseract
+        uploads.push(upload); // This insert as File
+      }
+      this.setState({
+        uploads: uploads
+      });
+    } else {
+      this.setState({
+        uploads: []
+      })
+    }
+  }
+
+  handleChangeTesseract = (event) => {
+    //event.preventDefault();
+    if (event.target.files[0]) {
+      var uploads = []
+      for (var key in event.target.files) {
+        if (!event.target.files.hasOwnProperty(key)) continue;
+        let upload = event.target.files[key];
+        //console.log('FILE UPLOADED: ', document.getElementById("fileUploader").value);
+        //console.log('FILE UPLOADED: ', document.getElementById("fileUploader").);
+
+        //console.log('FILE UPLOADED 1: ', upload);
+        //uploads.push(URL.createObjectURL(upload)); // This insert as Blob        
+        uploads.push(upload); //This insert as File
+
+        console.log('FILE UPLOADED 2: ', uploads[0]);
       }
       this.setState({
         uploads: uploads
@@ -50,10 +78,11 @@ class App extends Component {
   }
 
   /* WITH TESSERACT */
-  generateTesseractText = () => {
+  generateTesseractTextFromImage = (event) => {
+    event.preventDefault();
     let uploads = this.state.uploads
     for (var i = 0; i < uploads.length; i++) {
-      worker.recognize(uploads[i], { lang: 'spa' }).progress(progress => {
+      Tesseract.recognize(uploads[0], { lang: 'spa' }).progress(progress => {
         console.log('progress', progress);
       }).then(result => {
         console.log('RESULT: ', result);
@@ -83,6 +112,69 @@ class App extends Component {
     }
   }
 
+  /* WITH TESSERACT */
+  generateTesseractTextFromPdf = (event) => {
+    event.preventDefault();
+    let uploads = this.state.uploads
+
+    var PDFImage = require("pdf-image").PDFImage;
+    //console.log('PDFIMAGE: ', PDFImage);
+
+    /*var path = (window.URL || window.webkitURL).createObjectURL(uploads[0]);
+    console.log('PATH: ', path);*/
+
+    var pdfImage = new PDFImage(`C:\\Users\\ivan\\Desktop\\${uploads[0].name}`);
+    console.log('PDFIMAGE 2: ', pdfImage);
+
+    pdfImage.numberOfPages().then(value => {
+      console.log('NUMBER OF PAGES: ', value);
+    });
+
+    pdfImage.convertFile().then((imagePaths) => {
+      // [ /tmp/slide-0.png, /tmp/slide-1.png ]
+      console.log('IMAGE PATH: ', imagePaths);
+
+      /*let options = {
+        'tessjs_create_pdf': '1',
+        'tessjs_pdf_auto_download': true, // disable auto download
+        'tessjs_pdf_bin': false,            // add pdf file bin array in result
+      };
+      worker.recognize(uploads[0], 'spa', options).progress((p) => {
+        console.log('progress', p);
+      }).then(({ files: { pdf } }) => {
+        console.log(Object.values(pdf)); // As pdf is an array-like object, you need to do a little convertion first.
+        worker.terminate();
+      });*/
+
+    }).catch(error => {
+      console.log('ERROR: ', error);
+    });
+  }
+
+  generateTesseractTextFromPdf2 = (event) => {
+    event.preventDefault();
+    let uploads = this.state.uploads
+
+    this.getBase64(uploads[0]).then((base64Pdf) => {
+      console.log('BASE 64 PDF: ', base64Pdf);
+      var image = new Image();
+      let substr = base64Pdf.substr(28, base64Pdf.length);
+      //console.log('SUBSTR: ', substr);
+
+      image.src = 'data:image/png;base64,' + substr;
+      console.log('SRC IMAGE: ', image.src);
+      document.body.appendChild(image);
+
+      worker.recognize(image.src, 'spa').progress((p) => {
+        console.log('progress', p);
+      }).then(({ text }) => {
+        console.log(text);
+        worker.terminate();
+      });
+
+    });
+  }
+
   /* WITH Free OCR API and Base64Image */
   generatetextFromBase64Image = () => {
     let uploads = this.state.uploads
@@ -99,7 +191,7 @@ class App extends Component {
       // body.set('filetype', false); // PNG, JPG, GIF, PDF
       //body.set('OCREngine', 2);
 
-      let responseLines = new Array();
+      let responseLines = [];
 
       axios.post('https://api.ocr.space/parse/image', body).then(res => {
         const lines = res.data.ParsedResults[0].TextOverlay.Lines;
@@ -135,7 +227,7 @@ class App extends Component {
     body.set('scale', true);
     // body.set('filetype', false); // PNG, JPG, GIF, PDF
 
-    let responseLines = new Array();
+    let responseLines = [];
 
     axios.post('https://api.ocr.space/parse/image', body).then(res => {
       const lines = res.data.ParsedResults[0].TextOverlay.Lines;
@@ -154,92 +246,6 @@ class App extends Component {
     });
   }
 
-  scanToWebPageAndUpload() {
-    var scanRequest = {
-      "use_asprise_dialog": true, // Whether to use Asprise Scanning Dialog
-      "show_scanner_ui": false, // Whether scanner UI should be shown
-      "twain_cap_setting": { // Optional scanning settings
-        "ICAP_PIXELTYPE": "TWPT_RGB" // Color
-      },
-      "output_settings": [{
-        "type": "return-base64",
-        "format": "jpg"
-      }]
-    };
-
-    var scanRequest2 = {
-      "twain_cap_setting": {
-        "ICAP_PIXELTYPE": "TWPT_RGB", // Color
-        "ICAP_SUPPORTEDSIZES": "TWSS_USLETTER" // Paper size: TWSS_USLETTER, TWSS_A4, ...
-      },
-      "output_settings": [
-        { "type": "return-base64", "format": "jpg" }, // return images to web page
-        {
-          "type": "upload", "format": "pdf", // upload as PDF
-          "upload_target": {
-            "url": "https://asprise.com/scan/applet/upload.php?action=dump"
-          }
-        }
-      ]
-    };
-
-    scanner.scan(function displayImagesOnPage(successful, mesg, response) {
-      if (!successful) { // On error
-        console.error('Failed: ' + mesg);
-        return;
-      }
-
-      if (successful && mesg != null && mesg.toLowerCase().indexOf('user cancel') >= 0) { // User canceled.
-        console.info('User canceled');
-        return;
-      }
-
-      var scannedImages = scanner.getScannedImage(response, true, false); // returns an array of ScannedImage
-      for (var i = 0; (scannedImages instanceof Array) && i < scannedImages.length; i++) {
-        var scannedImage = scannedImages[i];
-        processScannedImage(scannedImage);
-      }
-    }, scanRequest);
-
-    /** Processes the scan result */
-    /* function displayImagesOnPage(successful, mesg, response) {
-      if (!successful) { // On error
-        console.error('Failed: ' + mesg);
-        return;
-      }
-
-      if (successful && mesg != null && mesg.toLowerCase().indexOf('user cancel') >= 0) { // User canceled.
-        console.info('User canceled');
-        return;
-      }
-
-      var scannedImages = scanner.getScannedImage(response, true, false); // returns an array of ScannedImage
-      for (var i = 0; (scannedImages instanceof Array) && i < scannedImages.length; i++) {
-        var scannedImage = scannedImages[i];
-        processScannedImage(scannedImage);
-      }
-    } */
-
-    /** Processes a ScannedImage */
-    function processScannedImage(scannedImage) {
-      let imagesScanned = [];
-      imagesScanned.push(scannedImage);
-      let img = document.createElement('img');
-      img.name = 'img';
-      img.src = scannedImage.src;
-      document.getElementById('body').appendChild(img);
-      //down.innerHTML = "Image Element Added.";
-
-      /*var elementImg = createDomElementFromModel({
-        'name': 'img',
-        'attributes': {
-          'class': 'scanned',
-          'src': scannedImage.src
-        }
-      });
-      document.getElementById('images').appendChild(elementImg);*/
-    }
-  }
 
   render() {
     return (
@@ -252,16 +258,16 @@ class App extends Component {
         <section className="hero">
           <label className="fileUploaderContainer">
             Click here to upload documents
-            <input type="file" id="fileUploader" onChange={this.handleChange} />
+            <input type="file" id="fileUploader" onChange={this.handleChangeTesseract} />
           </label>
 
           <div>
             {this.state.uploads.map((value, index) => {
-              return <img key={index} src={value} width="100px" />
+              return <img key={index} src={value} alt="imagealt" width="100px" />
             })}
           </div>
 
-          <button className="button" onClick={this.generatetextFromBase64Image}>Generate</button>
+          <button className="button" onClick={this.generateTesseractTextFromPdf}>Generate</button>
         </section>
 
         { /* Results */}
@@ -270,7 +276,7 @@ class App extends Component {
             return (
               <div key={index} className="results__result">
                 <div className="results__result__image">
-                  <img src={this.state.uploads[index]} width="250px" />
+                  <img src={this.state.uploads[index]} alt="imagealt" width="250px" />
                 </div>
                 <div className="results__result__info">
                   <div className="results__result__info__codes">
@@ -287,8 +293,6 @@ class App extends Component {
             )
           })}
         </section>
-        <div onClick={this.scanToWebPageAndUpload}>Scan image</div>
-        <div id="images"></div>
       </div>
     )
   }
