@@ -7,7 +7,7 @@ import { OcrLineResponseModel } from './OcrLineResponseModel';
 
 // Tesseract v2, npm install tesseract.js@next
 import Tesseract from 'tesseract.js';
-
+import PDFJS from 'pdf-image';
 const { TesseractWorker } = Tesseract;
 const worker = new TesseractWorker();
 
@@ -53,6 +53,7 @@ class App extends Component {
 
   handleChangeTesseract = (event) => {
     //event.preventDefault();
+    console.log('FILE: ', event.target.files[0]);
     if (event.target.files[0]) {
       var uploads = []
       for (var key in event.target.files) {
@@ -62,8 +63,8 @@ class App extends Component {
         //console.log('FILE UPLOADED: ', document.getElementById("fileUploader").);
 
         //console.log('FILE UPLOADED 1: ', upload);
-        //uploads.push(URL.createObjectURL(upload)); // This insert as Blob        
-        uploads.push(upload); //This insert as File
+        uploads.push(URL.createObjectURL(upload)); // This insert as Blob        
+        //uploads.push(upload); //This insert as File
 
         console.log('FILE UPLOADED 2: ', uploads[0]);
       }
@@ -116,62 +117,61 @@ class App extends Component {
   generateTesseractTextFromPdf = (event) => {
     event.preventDefault();
     let uploads = this.state.uploads
+    console.log('UPLOAD: ', uploads[0]);
 
-    var PDFImage = require("pdf-image").PDFImage;
+    PDFJS.getDocument({ url: uploads[0] }).then(function (pdf_doc) {
+
+
+      // Hide the pdf loader and show pdf container in HTML
+
+      // Show the first page
+      //showPage(1);
+    }).catch(function (error) {
+      // If error re-show the upload button
+
+      alert(error.message);
+    });
+
+    //var PDFImage = require("pdf-image").PDFImage;
     //console.log('PDFIMAGE: ', PDFImage);
 
-    /*var path = (window.URL || window.webkitURL).createObjectURL(uploads[0]);
-    console.log('PATH: ', path);*/
+    //pdfImage.convertFile().then((imagePaths) => {
+    // [ /tmp/slide-0.png, /tmp/slide-1.png ]
 
-    var pdfImage = new PDFImage(`C:\\Users\\ivan\\Desktop\\${uploads[0].name}`);
-    console.log('PDFIMAGE 2: ', pdfImage);
+    /*let options = {
+      'tessjs_create_pdf': '1',
+      'tessjs_pdf_auto_download': true, // disable auto download
+      'tessjs_pdf_bin': false,            // add pdf file bin array in result
+    };
+    worker.recognize(uploads[0], 'spa', options).progress((p) => {
+      console.log('progress', p);
+    }).then(({ files: { pdf } }) => {
+      console.log(Object.values(pdf)); // As pdf is an array-like object, you need to do a little convertion first.
+      worker.terminate();
+    });*/
 
-    pdfImage.numberOfPages().then(value => {
-      console.log('NUMBER OF PAGES: ', value);
-    });
-
-    pdfImage.convertFile().then((imagePaths) => {
-      // [ /tmp/slide-0.png, /tmp/slide-1.png ]
-      console.log('IMAGE PATH: ', imagePaths);
-
-      /*let options = {
-        'tessjs_create_pdf': '1',
-        'tessjs_pdf_auto_download': true, // disable auto download
-        'tessjs_pdf_bin': false,            // add pdf file bin array in result
-      };
-      worker.recognize(uploads[0], 'spa', options).progress((p) => {
-        console.log('progress', p);
-      }).then(({ files: { pdf } }) => {
-        console.log(Object.values(pdf)); // As pdf is an array-like object, you need to do a little convertion first.
-        worker.terminate();
-      });*/
-
-    }).catch(error => {
+    /*}).catch(error => {
       console.log('ERROR: ', error);
-    });
+    });*/
   }
 
   generateTesseractTextFromPdf2 = (event) => {
     event.preventDefault();
+    event.preventDefault();
     let uploads = this.state.uploads
+    console.log('UPLOAD: ', uploads[0]);
 
-    this.getBase64(uploads[0]).then((base64Pdf) => {
-      console.log('BASE 64 PDF: ', base64Pdf);
-      var image = new Image();
-      let substr = base64Pdf.substr(28, base64Pdf.length);
-      //console.log('SUBSTR: ', substr);
+    PDFJS.getDocument({ url: uploads[0] }).then((pdf_doc) => {
 
-      image.src = 'data:image/png;base64,' + substr;
-      console.log('SRC IMAGE: ', image.src);
-      document.body.appendChild(image);
 
-      worker.recognize(image.src, 'spa').progress((p) => {
-        console.log('progress', p);
-      }).then(({ text }) => {
-        console.log(text);
-        worker.terminate();
-      });
+      // Hide the pdf loader and show pdf container in HTML
 
+      // Show the first page
+      //showPage(1);
+    }).catch((error) => {
+      // If error re-show the upload button
+
+      alert(error.message);
     });
   }
 
@@ -267,7 +267,7 @@ class App extends Component {
             })}
           </div>
 
-          <button className="button" onClick={this.generateTesseractTextFromPdf}>Generate</button>
+          <button className="button" onClick={this.generateTesseractTextFromPdf2}>Generate</button>
         </section>
 
         { /* Results */}
@@ -293,6 +293,9 @@ class App extends Component {
             )
           })}
         </section>
+
+        {/* Canvas for PDF */}
+        <canvas id="pdf"></canvas>
       </div>
     )
   }
